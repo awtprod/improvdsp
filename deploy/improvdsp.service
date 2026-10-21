@@ -1,0 +1,18 @@
+[Unit]
+Description=Improv DSP - speech reinforcement (AGC + feedback control)
+After=sound.target
+Wants=sound.target
+
+[Service]
+Type=simple
+# Runs as root so "Save settings" can write /boot/firmware/improvdsp.conf
+# and the audio thread can use real-time priority.
+ExecStartPre=-/bin/sh -c 'for g in /sys/devices/system/cpu/cpufreq/policy*/scaling_governor; do echo performance > "$g"; done'
+ExecStart=/usr/local/bin/improvdsp -c /boot/firmware/improvdsp.conf
+Restart=always
+RestartSec=2
+LimitRTPRIO=95
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target
