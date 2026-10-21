@@ -72,7 +72,8 @@ recording at a show and you can check and tune against your actual room (see
 
 ## Parts
 
-- Raspberry Pi 5 with its 27 W USB-C power supply, and a microSD card
+- Raspberry Pi 5 with its 27 W USB-C power supply and active cooling, and a
+  microSD card or USB 3 flash drive for the operating system
 - Behringer UMC22 (about $53). It supplies the 48 V phantom power and the mic preamp.
 - Two cables, 1/4" TRS (balanced) to XLR male. One must reach the fill speaker if you use one.
 - Your Shure boundary mic, an XLR cable, and the two Alto TX308s
@@ -123,20 +124,18 @@ UMC22 OUT R ──TRS→XLR──► TX308 #2 (fill)   XLR in, volume knob in th
 4. Open the control page at `http://improv.local:8080/`, or
    `http://<pi-ip>:8080/`. Logs: `journalctl -u improvdsp -f`.
 
-### Phone control at the brewery (Pi as its own Wi-Fi hotspot)
+### Phone control away from home (Pi as its own Wi-Fi hotspot)
 
-```
-sudo apt install dnsmasq-base
-sudo nmcli device wifi hotspot ifname wlan0 ssid "ImprovDSP" password "choose-a-password"
-nmcli con show                                  # note the hotspot's connection name
-sudo nmcli con modify "<that name>" connection.autoconnect yes
-```
+The optional hotspot setup prefers saved home Wi-Fi at startup and broadcasts
+**ImprovDSP** when home Wi-Fi is unavailable. Join it with your chosen password
+and open **http://10.42.0.1:8080/**. The control page and DSP work without
+internet or venue Wi-Fi; the phone controls the Pi rather than supplying audio.
 
-- Join "ImprovDSP" from your phone and open `http://10.42.0.1:8080/`.
-- The control page has **no password**. The Wi-Fi password is what keeps the
-  audience off it.
-- To reach the internet again for updates, run
-  `sudo nmcli con up "<your home wifi>"`.
+See [deploy/HOTSPOT.md](deploy/HOTSPOT.md) for installation, private password
+entry, and network selection. The installer can use any saved home Wi-Fi client
+profile by UUID, or detect the active client on `wlan0`. Credentials and generated
+network profiles belong outside this checkout. The control page has no login,
+so access to the Wi-Fi network controls access to the page.
 
 ### Optional: protect the SD card from power cuts
 

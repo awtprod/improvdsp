@@ -1,0 +1,31 @@
+#!/bin/bash
+# At startup, explicitly try the saved home client before using the hotspot.
+# An optional UUID override permits testing the unavailable-home branch.
+set -euo pipefail
+. /etc/default/improvdsp-network
+SELECT_HOME_UUID=${1:-$HOME_CONNECTION_UUID}
+echo 'Waiting for the Wi-Fi adapter to become available (up to 20 seconds).'
+WIFI_READY=0
+for ((attempt=0; attempt<20; attempt++)); do
+    DEVICE_STATE=$(LC_ALL=C nmcli -g GENERAL.STATE device show wlan0 2>/dev/null || true)
+    DEVICE_STATE=${DEVICE_STATE%% *}
+    # A device can exist while its supplicant is still starting. NetworkManager
+    # states 10/20 (unmanaged/unavailable) cannot activate a client connection.
+    if [[ "$DEVICE_STATE" =~ ^[0-9]+$ ]] && (( DEVICE_STATE >= 30 )); then
+        WIFI_READY=1
+        break
+    fi
+    sleep 1
+done
+if (( WIFI_READY == 0 )); then
+    echo 'Wi-Fi adapter is not ready; systemd will retry the selector.' >&2
+    exit 1
+fi
+echo 'Trying saved home Wi-Fi (up to 25 seconds).'
+if nmcli --wait 25 connection up uuid "$SELECT_HOME_UUID" ifname wlan0; then
+    echo 'READY: using home Wi-Fi; hotspot remains available as a fallback.'
+else
+    echo 'Home Wi-Fi unavailable; starting ImprovDSP hotspot.'
+    nmcli --wait 20 connection up improvdsp-hotspot ifname wlan0
+    echo 'READY: join ImprovDSP and open http://10.42.0.1:8080/'
+fi

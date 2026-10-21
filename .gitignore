@@ -1,5 +1,36 @@
-improvdsp
-sim
-unit_tests
+# Build outputs and recordings.
+/improvdsp
+/sim
+/unit_tests
 *.o
 *.wav
+/recordings/
+
+# Private network profiles, credentials, and generated cloud-init payloads.
+*.nmconnection
+.env
+.env.*
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+known_hosts*
+*-known-hosts
+user-data
+network-config
+meta-data
+setup-summary.json
+source.tar.gz
+source.sha256
+
+# Local USB provisioning tools and machine-specific setup artifacts.
+/pi-setup/
+/deploy/prepare-pi.py
+/deploy/pi-firstboot.sh
+/deploy/improvdsp-setup.service
+*.img
+*.img.xz
+*.iso
+*.log
+*-verification.json
+*-verified.json

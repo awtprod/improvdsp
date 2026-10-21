@@ -1,0 +1,26 @@
+# Copy outside the checkout, protect with mode 600, and replace the password.
+# NetworkManager generates a UUID when loading a keyfile without one.
+[connection]
+id=improvdsp-hotspot
+type=wifi
+interface-name=wlan0
+autoconnect=true
+autoconnect-priority=-999
+
+[wifi]
+ssid=ImprovDSP
+mode=ap
+band=bg
+channel=6
+
+[wifi-security]
+key-mgmt=wpa-psk
+proto=rsn;
+psk=REPLACE_WITH_YOUR_HOTSPOT_PASSWORD
+
+[ipv4]
+method=shared
+address1=10.42.0.1/24
+
+[ipv6]
+method=disabled
